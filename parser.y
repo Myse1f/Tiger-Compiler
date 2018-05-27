@@ -64,7 +64,6 @@ void yyerror(char *msg);
 %type <nametyList> tydecs
 %type <fundec> fundec
 %type <fundecList> fundecs
-%type <ty> ty
 %type <fieldList> fields field
 %type <efieldList> efield_seq
 
