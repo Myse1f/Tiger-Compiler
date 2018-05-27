@@ -12,8 +12,8 @@ void EM_newline(void);
 
 extern int EM_tokPos;
 
-void EM_error(int, string,...);
+void EM_error(int, string_t,...);
 //void EM_impossible(string,...);
-void EM_reset(string filename);
+void EM_reset(string_t filename);
 
 #endif

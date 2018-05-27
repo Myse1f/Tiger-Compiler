@@ -2,7 +2,7 @@
 
 bool anyErrors= FALSE;
 
-static string fileName = "";
+static string_t fileName = "";
 
 static int lineNum = 1;
 
@@ -55,7 +55,7 @@ void EM_error(int pos, char *message,...)
 	fprintf(stderr,"\n");
 }
 
-void EM_reset(string fname)
+void EM_reset(string_t fname)
 {
 	anyErrors=FALSE; 
 	fileName=fname; 

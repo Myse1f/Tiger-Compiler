@@ -53,11 +53,11 @@ void yyerror(char *msg);
 %left <pos> TIMES DIVIDE
 %left <pos> UMINUS
 
-%type <dec> dec var_dec
 %type <exp> program exp
+%type <expList> exp_seq arg_seq
 %type <type> type
 %type <var> lvalue lvalue_
-%type <expList> exp_seq arg_seq
+%type <dec> dec var_dec
 %type <decLsit> decs 
 %type <namety> tydec
 %type <nametyList> tydecs
@@ -82,3 +82,134 @@ exp:
     {
         $$ = VarExp($1->pos, $1);
     }
+    | lvalue ASSIGN exp 
+    {
+        $$ = AssignExp($1->pos, $1, $3);
+    }
+    | INT
+    {
+
+    }
+    | STRING
+    {
+
+    }
+    | NIL 
+    {
+
+    }
+
+    | LPAREN RPAREN
+    {
+
+    }
+    | LPAREN exp_seq RPAREN
+    {
+
+    }
+
+    /* binary operation */
+    | MINUS exp %prec UMINUS
+    {
+
+    }
+    | exp PLUS exp
+    {
+
+    }
+    | exp MINUS exp 
+    {
+
+    }
+    | exp TIMES exp
+    {
+
+    }
+    | exp DIVIDE exp 
+    {
+
+    }
+    | exp EQ exp 
+    {
+
+    } 
+    | exp NEQ exp 
+    {
+
+    }
+    | exp LT exp 
+    {
+
+    }
+    | exp GT exp 
+    {
+
+    }
+    | exp LE exp 
+    {
+
+    }
+    | exp GE exp 
+    {
+
+    }
+    
+    /* condition AND and OR */
+    | exp AND exp 
+    {
+
+    }
+    | exp OR exp 
+    {
+
+    }
+
+    /* function call */
+    | ID LPAREN RPAREN
+    {
+
+    }
+    | ID LPAREN arg_seq RPAREN
+    {
+
+    }
+    
+    /* array */
+    | ID LBRACK exp RBRACK OF exp 
+    {
+
+    }
+    /* record */
+    | ID LBRACE RBRACE
+    {
+
+    }
+    | ID LBRACE efield_seq RBRACE
+    {
+
+    }
+
+    /* if then */
+    | IF exp THEN exp 
+    {
+
+    }
+    | IF exp THEN exp ELSE exp
+    {
+
+    }
+    /* loop */
+    | WHILE exp DO exp
+    {
+
+    }
+    | FOR ID ASSIGN exp TO exp DO exp 
+    {
+
+    }
+    | BREAK 
+    {
+
+    }
+
+    | 
