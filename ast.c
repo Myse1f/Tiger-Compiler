@@ -1,7 +1,7 @@
 #include "ast.h"
 
 var_t SimpleVar(pos_t pos, symbol_t sym){
-    var_t p = checked_malloc(sizeof(*t));
+    var_t p = checked_malloc(sizeof(*p));
     p->kind = A_simpleVar;
     p->pos = pos;
     p->u.simple = sym;
@@ -10,7 +10,7 @@ var_t SimpleVar(pos_t pos, symbol_t sym){
 }
 
 var_t FieldVar(pos_t pos, var_t var, symbol_t sym) {
-    var_t p = checked_malloc(sizeof(*t));
+    var_t p = checked_malloc(sizeof(*p));
     p->kind = A_fieldVar;
     p->pos = pos;
     p->u.field.var = var;
@@ -20,7 +20,7 @@ var_t FieldVar(pos_t pos, var_t var, symbol_t sym) {
 }
 
 var_t SubscriptVar(pos_t pos, var_t var, exp_t exp) {
-    var_t p = checked_malloc(sizeof(*t));
+    var_t p = checked_malloc(sizeof(*p));
     p->kind = A_subscriptVar;
     p->pos = pos;
     p->u.subscript.var = var;
@@ -211,7 +211,7 @@ ty_t NameTy(pos_t pos, symbol_t name) {
     ty_t p = checked_malloc(sizeof(*p));
     p->kind = A_nameTy;
     p->pos = pos;
-    p->u.name = name;
+    p->u.var = name;
 
     return p;    
 }
