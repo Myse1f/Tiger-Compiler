@@ -105,7 +105,6 @@ type		{ ADJ; return TYPE; }
 <STRING>\\\n	{ ADJ; EM_newline(); continue; }
 <STRING>\\[0-3][0-8]{2}
 {
-	// ASCII code in Octal
 	char c = 0;
 	ADJ;
 	c = yytext[1]<<6 + yytext[2]<<3 +yytext[3];
@@ -114,7 +113,6 @@ type		{ ADJ; return TYPE; }
 }
 <STRING>\"
 {
-	// End of string
     ADJ;
     BEGIN(INITIAL);
     yylval.str = sBuf;
@@ -122,7 +120,6 @@ type		{ ADJ; return TYPE; }
 }
 <STRING>[^\\]+
 {
-	// Normal string content
 	char *p = yytext;
 	ADJ;
 	while (*p) append_char(*p++);
