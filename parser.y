@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "ast.h"
 #include "past.h"
-#include "errmsg.h"
+#include "errormsg.h"
 #include "symbol.h"
 #include "utils.h"
 
