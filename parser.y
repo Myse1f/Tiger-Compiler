@@ -97,7 +97,7 @@ exp:
     }
     | NIL 
     {
-        $$ = NilExp(EM_tokPos, $1);
+        $$ = NilExp(EM_tokPos);
     }
 
     | LPAREN RPAREN
