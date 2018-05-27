@@ -93,7 +93,7 @@ exp:
     }
     | STRING
     {
-        $$ = StringExp(EM_tokPos, $1);
+        $$ = StringExp(EM_tokPos);
     }
     | NIL 
     {
