@@ -1,7 +1,7 @@
 %{
 #include <string.h>
-#include "util.h"
-#include "tokens.h"
+#include "utils.h"
+#include "yy.tab.h"
 #include "errormsg.h"
 
 int charPos = 1;
@@ -83,7 +83,7 @@ var			{ ADJ; return VAR; }
 type		{ ADJ; return TYPE; }
 
 {number}	{ ADJ; yylval.ival = atoi(yytext); return INT; }
-{id}		{ ADJ; yylval.sval = String(yytext); return ID; }
+{id}		{ ADJ; yylval.sval = string(yytext); return ID; }
 
 "/*"		{ ADJ; cmtLevel = 1; BEGIN(COMMENT); continue; }
 <COMMENT>[^*/\n]	{ ADJ; continue; }
