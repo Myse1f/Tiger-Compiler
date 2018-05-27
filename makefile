@@ -19,8 +19,8 @@ errormsg.o: errormsg.c errormsg.h utils.h
 lex.yy.o: lex.yy.c y.tab.h errormsg.h utils.h
 	gcc -g -c lex.yy.c
 
-lex.yy.c: tiger.lex
-	lex tiger.lex
+lex.yy.c: tiger.l
+	lex tiger.l
 
 past.o: past.c past.h
 	gcc -g -c past.c

@@ -23,7 +23,7 @@ void yyerror(char *msg);
     var_t var;
     exp_t exp;
     dec_t dec;
-    ty_t type;
+    ty_t ty;
     decList_t decList;
     expList_t expList;
     field_t field;
@@ -56,7 +56,7 @@ void yyerror(char *msg);
 
 %type <exp> program exp
 %type <expList> exp_seq arg_seq
-%type <type> type
+%type <ty> ty
 %type <var> lvalue
 %type <dec> dec vardec
 %type <decLsit> decs 
