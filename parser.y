@@ -29,7 +29,7 @@ void yyerror(char *msg);
     field_t field;
     fieldList_t fieldList;
     fundec_t fundec;
-    fundecList_t funList;
+    fundecList_t fundecList;
     namety_t namety;
     nametyList_t nametyList;
     efield_t efield;
@@ -59,7 +59,7 @@ void yyerror(char *msg);
 %type <ty> ty
 %type <var> lvalue
 %type <dec> dec vardec
-%type <decLsit> decs 
+%type <decList> decs 
 %type <namety> tydec
 %type <nametyList> tydecs
 %type <fundec> fundec
@@ -93,7 +93,7 @@ exp:
     }
     | STRING
     {
-        $$ = StringExp(EM_tokPos);
+        $$ = StringExp(EM_tokPos, $1);
     }
     | NIL 
     {
@@ -335,7 +335,7 @@ tydec:
 ty:
     ID 
     {
-        $$ = NameTy(EM_tokPos, S_Symbol($1));
+        $$ = NameTy(EM_tokPos, Symbol($1));
     }
     | LBRACE fields RBRACE
     {
