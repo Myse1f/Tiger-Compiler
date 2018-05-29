@@ -11,6 +11,7 @@ static exp_t ast_root;
 
 int yylex(void);
 void yyerror(char *msg);
+exp_t parse();
 %}
 
 %debug
@@ -406,4 +407,17 @@ fundec:
 
 void yyerror(char *msg) {
     EM_error(EM_tokPos, "%s", msg);
+}
+
+exp_t parse(string_t fname) 
+{
+    EM_reset(fname);
+    if (yyparse() == 0) {/* parsing worked */
+        fprintf(stderr,"Parsing successful!\n");
+        return ast_root;
+    }
+    else { 
+        fprintf(stderr,"Parsing failed\n");
+        return NULL;
+    }
 }

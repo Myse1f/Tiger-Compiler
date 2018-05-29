@@ -23,12 +23,12 @@ struct table_s
 
 static binder_t Binder(void *key, void *value, binder_t next, void* prevtop)
 {
-    binder_t b = checked_malloc(sizeof(*p));
+    binder_t b = checked_malloc(sizeof(*b));
     b->key = key;
     b->value = value;
     b->next = next;
     b->prevtop = prevtop;
-    return p;
+    return b;
 }
 
 table_t TableEmpty(void) {

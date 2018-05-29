@@ -65,5 +65,5 @@ void SymbolEndScope(table_t tab) {
     symbol_t sym;
     do
         sym = TablePop(tab);
-    while (sym != marksym);
+    while (sym != &marksym);
 }

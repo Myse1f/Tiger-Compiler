@@ -3,25 +3,15 @@
 #include "past.h"
 #include "errormsg.h"
 
-extern int yyparse(void);
-extern exp_t ast_root;
-
-void parse(string_t fname) 
-{
-    EM_reset(fname);
-    if (yyparse() == 0) /* parsing worked */
-        fprintf(stderr,"Parsing successful!\n");
-    else 
-        fprintf(stderr,"Parsing failed\n");
-}
-
-
 int main(int argc, char **argv) {
-    if (argc!=2) {
+    if (argc!=3) {
         fprintf(stderr,"usage: a.out filename\n"); 
         exit(1);
     }
-    parse(argv[1]);
+
+    exp_t ast_root;
+
+    ast_root = parse(argv[1]);
 
     // print ast
     FILE *out = fopen(argv[2], "w");

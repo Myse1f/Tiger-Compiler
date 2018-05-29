@@ -1,4 +1,4 @@
-a.out: parsetest.o y.tab.o lex.yy.o errormsg.o ast.o past.o symbol.o utils.o
+a.out: parsetest.o y.tab.o lex.yy.o errormsg.o ast.o past.o symbol.o table.o utils.o
 	gcc -g parsetest.o y.tab.o lex.yy.o errormsg.o ast.o past.o symbol.o table.o utils.o
 
 parsetest.o: parsetest.c errormsg.h utils.h past.h
@@ -32,7 +32,7 @@ symbol.o: symbol.c symbol.h
 	gcc -g -c symbol.c
 
 table.o: table.c table.h
-	gcc -g -c utils.c
+	gcc -g -c table.c
 
 utils.o: utils.c utils.h
 	gcc -g -c utils.c

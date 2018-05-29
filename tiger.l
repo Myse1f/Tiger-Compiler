@@ -1,154 +1,122 @@
 %{
 #include <string.h>
-#include "utils.h"
-#include "yy.tab.h"
+#include "util.h"
+#include "absyn.h"
+#include "y.tab.h"
 #include "errormsg.h"
 
-int charPos = 1;
+int charPos=1;
+int commentDepth=0;
+
+/* String handling variables/functions */
+#define BUFSIZE 8192
+char strbuf[BUFSIZE+1];
+char *strptr = NULL;
+unsigned int strlength = 0;
+
+void setup(void)
+{
+	*strbuf = '\0';
+	strlength = 0;
+}
+
+char *teardown()
+{
+	char *s = checked_malloc(strlen(strbuf)+1);
+	strcpy(s, strbuf);
+	return s;
+}
+
+void appendstr(char *str)
+{
+	if ((strlength + strlen(str)) < BUFSIZE) {
+		strcat(strbuf, str);
+		strlength += strlen(str);
+	}
+}
 
 int yywrap(void)
 {
-	charPos=1;
-	return 1;
+ charPos=1;
+ return 1;
 }
 
-#define ADJ \
-{ \
-    EM_tokPos = charPos; \
-    charPos += yyleng; \
+
+void adjust(void)
+{
+ EM_tokPos=charPos;
+ charPos+=yyleng;
 }
-
-static int cmtLevel = 0;
-
-#define INIT_LEN 32
-static string sBuf;
-static int sLen;
-static int sCap;
-static void init_buf(void);
-static void append_char(char ch);
 
 %}
+%x COMMENT STR
+%%
+[ \t]	{adjust(); continue;}
+(\n|\r\n)  {adjust(); EM_newline(); continue;}
+"*"   {adjust(); return TIMES;}
+"/"   {adjust(); return DIVIDE;}
+"/*"  {adjust(); BEGIN(COMMENT); commentDepth++;}
+<COMMENT>{
+	"/*" {adjust(); commentDepth++;}
+	"*/" {adjust(); if (--commentDepth == 0) BEGIN(INITIAL);}
+	[^\n] {adjust();}
+	(\n|\r\n)	{adjust(); EM_newline();}
+}
+"while" {adjust(); return WHILE;}
+"for"   {adjust(); return FOR;}
+"to"	{adjust(); return TO;}
+"break" {adjust(); return BREAK;}
+"let"	 {adjust(); return LET;}
+"in"  {adjust(); return IN;}
+"end"   {adjust(); return END;}
+"function" {adjust(); return FUNCTION;}
+"var"   {adjust(); return VAR;}
+"type"  {adjust(); return TYPE;}
+"array" {adjust(); return ARRAY;}
+"if"	  {adjust(); return IF;}
+"then"  {adjust(); return THEN;}
+"else"  {adjust(); return ELSE;}
+"do"	  {adjust(); return DO;}
+"of"	  {adjust(); return OF;}
+"nil"	  {adjust(); return NIL;}
+[a-zA-Z][a-zA-Z0-9_]*    {adjust(); yylval.str=string(yytext); return ID;}
+","	  {adjust(); return COMMA;}
+":"	  {adjust(); return COLON;}
+";"	  {adjust(); return SEMICOLON;}
+"("	  {adjust(); return LPAREN;}
+")"    {adjust(); return RPAREN;}
+"["    {adjust(); return LBRACK;}
+"]"   {adjust(); return RBRACK;}
+"{"   {adjust(); return LBRACE;}
+"}"   {adjust(); return RBRACE;}
+"."   {adjust(); return DOT;}
+"+"   {adjust(); return PLUS;}
+"-"   {adjust(); return MINUS;}
+"="   {adjust(); return EQ;}
+"<>"  {adjust(); return NEQ;}
+"<"   {adjust(); return LT;}
+"<="  {adjust(); return LE;}
+">"   {adjust(); return GT;}
+">="  {adjust(); return GE;}
+":="  {adjust(); return ASSIGN;}
+"&"	  {adjust(); return AND;}
+"|"	  {adjust(); return OR;}
+[0-9]+	 {adjust(); yylval.num=atoi(yytext); return INT;}
 
-blank       [" "\t]
-number		[0-9]+
-id			[_a-zA-Z][_a-zA-Z0-9]*
-
-%x COMMENT STRING
-
+\" {adjust(); BEGIN(STR); setup();}
+<STR>{
+	\" 			{adjust(); yylval.str=teardown(); BEGIN(INITIAL); return STRING;}
+	\\n			{adjust(); appendstr("\n");}
+	\\t			{adjust(); appendstr("\t");}
+	\\[0-9]{3}	{adjust(); appendstr(yytext);}
+	\\^[GHIJLM]	{adjust(); appendstr(yytext);}
+	\\\\		{adjust(); appendstr(yytext);}
+	\\\"		{adjust(); appendstr(yytext);}
+	\\[ \n\t\r\f]+\\ {adjust();}
+	\\(.|\n)	{adjust(); EM_error(EM_tokPos, "illegal token");}
+	\n			{adjust(); EM_error(EM_tokPos, "illegal token");}
+	[^\"\\\n]+ 	{adjust(); appendstr(yytext);}
+}
+.	 {adjust(); EM_error(EM_tokPos,"illegal token");}
 %%
 
-{blank}		{ ADJ; continue; }
-\n			{ ADJ; EM_newline(); continue; }
-
-","			{ ADJ; return COMMA; }
-":"			{ ADJ; return COLON; }
-";"			{ ADJ; return SEMICOLON; }
-"("			{ ADJ; return LPARAN; }
-")"			{ ADJ; return RPARAN; }
-"["			{ ADJ; return LBRACK; }
-"]"			{ ADJ; return RBRACK; }
-"{"			{ ADJ; return LBRACE; }
-"}"			{ ADJ; return RBRACE; }
-"."			{ ADJ; return DOT; }
-"+"			{ ADJ; return PLUS; }
-"-"			{ ADJ; return MINUS; }
-"*"			{ ADJ; return TIMES; }
-"/"			{ ADJ; return DIVIDE; }
-"="			{ ADJ; return EQ; }
-"<>"		{ ADJ; return NEQ; }
-"<"			{ ADJ; return LT; }
-"<="		{ ADJ; return LE; }
-">"			{ ADJ; return GT; }
-">="		{ ADJ; return GE; }
-"&"			{ ADJ; return AND; }
-"|"			{ ADJ; return OR; }
-":="		{ ADJ; return ASSIGN; }
-
-array		{ ADJ; return ARRAY; }
-if			{ ADJ; return IF; }
-then		{ ADJ; return THEN; }
-else		{ ADJ; return ELSE; }
-while		{ ADJ; return WHILE; }
-for			{ ADJ; return FOR; }
-to			{ ADJ; return TO; }
-do			{ ADJ; return DO; }
-let			{ ADJ; return LET; }
-in			{ ADJ; return IN; }
-end			{ ADJ; return END; }
-of			{ ADJ; return OF; }
-break		{ ADJ; return BREAK; }
-nil			{ ADJ; return NIL; }
-function	{ ADJ; return FUNCTION; }
-var			{ ADJ; return VAR; }
-type		{ ADJ; return TYPE; }
-
-{number}	{ ADJ; yylval.ival = atoi(yytext); return INT; }
-{id}		{ ADJ; yylval.sval = string(yytext); return ID; }
-
-"/*"		{ ADJ; cmtLevel = 1; BEGIN(COMMENT); continue; }
-<COMMENT>[^*/\n]	{ ADJ; continue; }
-<COMMENT>\n			{ ADJ; EM_newline(); continue; }
-<COMMENT>"/*"		{ ADJ; cmtLevel++; continue; }
-<COMMENT>"*/"		
-{
-	ADJ;
-	cmtLevel--;
-	if (!cmtLevel) BEGIN(INITIAL);
-}
-
-\"			{ ADJ; init_buf(); BEGIN(STRING); continue; }
-<STRING>\\\\	{ ADJ; append_char('\\'); continue; }
-<STRING>\\\"	{ ADJ; append_char('\"'); continue; }
-<STRING>\\n		{ ADJ; append_char('\n'); continue; }
-<STRING>\\t		{ ADJ; append_char('\t'); continue; }
-<STRING>\\r		{ ADJ; append_char('\r'); continue; }
-<STRING>\\\n	{ ADJ; EM_newline(); continue; }
-<STRING>\\[0-3][0-8]{2}
-{
-	char c = 0;
-	ADJ;
-	c = yytext[1]<<6 + yytext[2]<<3 +yytext[3];
-	append_char(c);
-	continue;
-}
-<STRING>\"
-{
-    ADJ;
-    BEGIN(INITIAL);
-    yylval.str = sBuf;
-    return STRING;
-}
-<STRING>[^\\]+
-{
-	char *p = yytext;
-	ADJ;
-	while (*p) append_char(*p++);
-	continue;
-}
-.	{ ADJ; EM_error(EM_tokPos, "Illegal character"); }
-
-%%
-
-static void init_buf(void)
-{
-    sBuf = checked_malloc(INIT_LEN);
-    sBuf[0] = 0;
-    sLen = 0;
-    sCap = INIT_LEN;
-}
-
-static void append_char(char ch)
-{
-    if (++sLen == sCap)
-    {
-        char *p;
-
-        sCap *= 2;
-        p = checked_malloc(sCap);
-        memcpy(p, sBuf, sLen);
-        free(sBuf);
-        sBuf = p;
-    }
-    sBuf[sLen - 1] = ch;
-    sBuf[sLen] = 0;
-}
